@@ -1,0 +1,44 @@
+{% comment %}
+  The Well Build — Spec Book intake link for the Shopify ORDER CONFIRMATION email.
+
+  WHERE TO PASTE
+    Shopify admin → Settings → Notifications → Customer notifications → Order confirmation → Edit code.
+    Paste this whole block just ABOVE the line that starts the order summary
+    (search the template for "Order summary"). Save.
+
+  WHAT IT DOES
+    Shows a "Start your intake" block only when the order includes the Spec Book
+    (product handle healthy-home-spec-book). Other orders look exactly as they do today.
+    The link carries only the order number (no name or email in the URL).
+
+  HOW TO TEST
+    After saving, click "Send test notification" at the top of the template editor.
+    The sample order Shopify uses won't contain the Spec Book, so to see the block, temporarily
+    change  == 'healthy-home-spec-book'  to  != ''  , send the test, then change it back.
+    Then place a real test order (Bogus Gateway or a 100% discount code) to confirm end to end.
+{% endcomment %}
+{% assign twb_has_spec_book = false %}
+{% for line in line_items %}
+  {% if line.product.handle == 'healthy-home-spec-book' %}
+    {% assign twb_has_spec_book = true %}
+  {% endif %}
+{% endfor %}
+{% if twb_has_spec_book %}
+  {% capture twb_intake_url %}https://specbook.thewellbuild.com/?order={{ order_name | remove: '#' | url_encode }}{% endcapture %}
+  <table class="row" style="width:100%;border-spacing:0;border-collapse:collapse;margin:24px 0;">
+    <tr>
+      <td style="background:#F1F6F2;border:1px solid #C5D8CC;border-radius:10px;padding:20px 22px;font-family:Helvetica,Arial,sans-serif;color:#2A2A2A;">
+        <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#B07D4A;font-weight:bold;margin-bottom:6px;">Next step</div>
+        <div style="font-family:Georgia,serif;font-size:22px;color:#1E4430;margin-bottom:8px;">Tell us about your project</div>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
+          Your Spec Book starts with a short questionnaire (about 10 minutes) and a link to your drawings.
+          Your review begins once we have both, and typically arrives 7–10 business days after that.
+        </p>
+        <a href="{{ twb_intake_url }}" style="display:inline-block;background:#1E4430;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:15px;">Start your intake &rarr;</a>
+        <p style="margin:14px 0 0;font-size:13px;color:#6B6B6B;">
+          If the button doesn't work, go to <a href="{{ twb_intake_url }}" style="color:#1E4430;">specbook.thewellbuild.com</a>.
+        </p>
+      </td>
+    </tr>
+  </table>
+{% endif %}

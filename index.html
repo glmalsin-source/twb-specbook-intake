@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Well Build — Spec Book Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          twb: {
+            green: '#1E4430', green2: '#2B5C3F', sage: '#7A9E8A', sage2: '#C5D8CC',
+            copper: '#B07D4A', copper2: '#C4915E', cream: '#FAF8F4', cream2: '#FEFDFB',
+            blue: '#A8C8D6', blue2: '#D4E8EF', ink: '#2A2A2A', text: '#3A3A3A',
+            mute: '#6B6B6B', clay: '#A8593E'
+          }
+        },
+        fontFamily: {
+          serif: ['"DM Serif Display"', 'serif'],
+          sans: ['"DM Sans"', 'system-ui', 'sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /* Same look as builderform.thewellbuild.com (twb-builder-form/index.html). Light only, by design. */
+  html, body { background:#FAF8F4; color:#3A3A3A; font-family:'DM Sans',system-ui,sans-serif; }
+  h1,h2,h3,.serif { font-family:'DM Serif Display', serif; color:#1E4430; font-weight:400; }
+  .field-input {
+    width:100%; border:1px solid #C5D8CC; background:#FEFDFB; border-radius:8px;
+    padding:10px 12px; color:#2A2A2A; transition:border-color .15s, box-shadow .15s;
+  }
+  .field-input:focus { outline:none; border-color:#2B5C3F; box-shadow:0 0 0 3px rgba(43,92,63,.15); }
+  .field-input::placeholder { color:#9CA8A0; }
+  .chip {
+    display:inline-flex; align-items:center; gap:8px; padding:8px 14px;
+    border:1px solid #C5D8CC; background:#FEFDFB; border-radius:999px; cursor:pointer;
+    transition:all .12s ease; font-size:14px; text-align:left;
+  }
+  .chip:hover { border-color:#7A9E8A; background:#F1F6F2; }
+  .chip[aria-pressed="true"] { background:#1E4430; color:#FEFDFB; border-color:#1E4430; }
+  .chip.unsure { border-style:dashed; color:#6B6B6B; }
+  .chip.unsure[aria-pressed="true"] { background:#6B6B6B; border-color:#6B6B6B; border-style:solid; color:#FEFDFB; }
+  .chip:disabled { opacity:.45; cursor:not-allowed; }
+  .btn-primary { background:#1E4430; color:#FEFDFB; padding:10px 18px; border-radius:8px; font-weight:600; transition:background .15s, transform .05s; }
+  .btn-primary:hover { background:#2B5C3F; }
+  .btn-primary:active { transform:translateY(1px); }
+  .btn-secondary { background:#FEFDFB; color:#1E4430; padding:10px 18px; border-radius:8px; font-weight:600; border:1px solid #C5D8CC; }
+  .btn-secondary:hover { border-color:#7A9E8A; background:#F1F6F2; }
+  .btn-ghost { color:#6B6B6B; padding:8px 12px; border-radius:8px; font-weight:500; }
+  .btn-ghost:hover { color:#1E4430; background:#F1F6F2; }
+  .btn-copper { background:#B07D4A; color:#FEFDFB; padding:10px 18px; border-radius:8px; font-weight:600; }
+  .btn-copper:hover { background:#C4915E; }
+  .sec-link { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; color:#3A3A3A; cursor:pointer; font-size:14px; line-height:1.3; }
+  .sec-link:hover { background:#F1F6F2; }
+  .sec-link.active { background:#C5D8CC; color:#1E4430; font-weight:600; }
+  .sec-dot { flex-shrink:0; width:10px; height:10px; border-radius:999px; background:#E8E0D4; border:1px solid #C5D8CC; }
+  .sec-link[data-status="started"] .sec-dot { background:#A8C8D6; border-color:#A8C8D6; }
+  .sec-link[data-status="complete"] .sec-dot { background:#1E4430; border-color:#1E4430; }
+  .sec-num { width:22px; flex-shrink:0; text-align:right; color:#6B6B6B; font-variant-numeric:tabular-nums; font-size:12px; }
+  .nav-part { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:#6B6B6B; font-weight:600; padding:12px 12px 4px; }
+  .progress-bar { background:#E8E0D4; height:6px; border-radius:999px; overflow:hidden; }
+  .progress-fill { background:linear-gradient(90deg,#2B5C3F,#7A9E8A); height:100%; transition:width .3s ease; }
+  .question-card { background:#FEFDFB; border:1px solid rgba(123,158,138,.25); border-radius:14px; padding:18px 20px; margin-bottom:14px; transition:border-color .15s; }
+  .question-card:focus-within { border-color:#7A9E8A; }
+  .qlabel { font-weight:600; color:#2A2A2A; margin-bottom:6px; display:flex; gap:10px; align-items:baseline; }
+  .qnum { font-size:12px; color:#6B6B6B; font-weight:500; font-variant-numeric:tabular-nums; min-width:1.4em; text-align:right; flex-shrink:0; }
+  .qhelper { font-size:13px; color:#6B6B6B; margin-bottom:10px; }
+  .glabel { font-size:12.5px; color:#6B6B6B; font-weight:600; margin:12px 0 6px; }
+  .req { color:#A8593E; margin-left:4px; }
+  .note-toggle { font-size:13px; color:#6B6B6B; margin-top:10px; text-decoration:underline; text-underline-offset:3px; text-decoration-color:#C5D8CC; }
+  .note-toggle:hover { color:#1E4430; }
+  .save-pill { font-size:12px; color:#6B6B6B; padding:4px 10px; border-radius:999px; background:#F1F6F2; display:inline-flex; align-items:center; gap:6px; }
+  .draft-band { background:#B07D4A; color:#FEFDFB; font-size:13px; text-align:center; padding:6px 16px; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1E4430; color:#FEFDFB; padding:12px 20px; border-radius:10px; box-shadow:0 10px 40px rgba(30,68,48,.25); z-index:100; opacity:0; transition:opacity .25s, transform .25s; pointer-events:none; max-width:calc(100vw - 32px); }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(-6px); }
+  .overlay { position:fixed; inset:0; background:rgba(30,68,48,.55); display:flex; align-items:center; justify-content:center; padding:16px; z-index:50; backdrop-filter:blur(4px); }
+  .overlay-card { background:#FEFDFB; border-radius:18px; max-width:620px; width:100%; padding:28px; max-height:90vh; overflow:auto; }
+  .subhead { font-family:'DM Serif Display', serif; color:#1E4430; font-size:18px; border-top:1px dashed #C5D8CC; padding-top:18px; margin:14px 4px 10px; }
+  .subhead:first-child { border-top:0; padding-top:0; }
+  .callout { background:#F1F6F2; border:1px solid #C5D8CC; border-radius:12px; padding:14px 16px; font-size:14px; margin-bottom:14px; }
+  .callout ul { list-style:disc; padding-left:20px; margin-top:6px; }
+  .callout li { margin:2px 0; }
+  .preview-table td { padding:6px 10px; border-top:1px solid #EFEAE0; vertical-align:top; font-size:13px; }
+  .preview-table td:first-child { color:#6B6B6B; width:45%; }
+  @media print { .no-print { display:none !important; } body { background:#fff; } .question-card { break-inside:avoid; } }
+  .nice-scroll::-webkit-scrollbar { width:8px; }
+  .nice-scroll::-webkit-scrollbar-thumb { background:#C5D8CC; border-radius:4px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- DRAFT MODE: remove this band when APPS_SCRIPT_URL is set -->
+<div id="draftBand" class="draft-band no-print hidden">Draft for review. Submissions are turned off, so nothing you enter here is sent.</div>
+
+<!-- ============ INTRO OVERLAY ============ -->
+<div id="introOverlay" class="overlay no-print hidden">
+  <div class="overlay-card">
+    <div class="text-xs uppercase tracking-widest text-twb-copper font-semibold mb-2">The Well Build</div>
+    <h1 class="text-3xl mb-3">Before your Spec Book starts</h1>
+    <p class="text-twb-text mb-4">
+      Thank you for your order. These questions cover what your drawings can't tell us: how your household
+      lives, what matters most to you, and the choices still open. Your answers set the focus of your review.
+    </p>
+    <ul class="space-y-2 text-sm text-twb-text mb-5">
+      <li class="flex gap-2"><span class="text-twb-green flex-shrink-0">●</span><span>About <strong>10 minutes</strong>. Every question has a <strong>Not sure</strong> answer, and those are expected.</span></li>
+      <li class="flex gap-2"><span class="text-twb-green flex-shrink-0">●</span><span>You'll tell us <strong>how your drawings will reach us</strong>: a share link, WeTransfer or email.</span></li>
+      <li class="flex gap-2"><span class="text-twb-green flex-shrink-0">●</span><span>Progress is <strong>saved on this device</strong> as you go, and you can email yourself a link to finish later.</span></li>
+      <li class="flex gap-2"><span class="text-twb-green flex-shrink-0">●</span><span>Your review begins once we have this form and your drawings. Delivery is typically <strong>7–10 business days</strong> from then.</span></li>
+    </ul>
+    <div class="flex flex-wrap gap-3">
+      <button id="introStart" class="btn-primary">Start →</button>
+      <button id="introResume" class="btn-secondary hidden">Resume where I left off</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ COMPLETION OVERLAY ============ -->
+<div id="doneOverlay" class="overlay no-print hidden">
+  <div class="overlay-card">
+    <h1 id="doneTitle" class="text-3xl mb-2">Thank you</h1>
+    <p id="doneLede" class="text-twb-text mb-5">We have your answers, and a copy is on its way to your inbox.</p>
+    <div id="doneBuilder" class="callout hidden">
+      <div class="font-semibold text-twb-green mb-1">Forward this link to your builder or architect</div>
+      <p class="mb-3">It opens their 15 questions for your project. No login is needed, and their answers come straight to us. It's also in your confirmation email.</p>
+      <div class="flex gap-2 flex-wrap"><input id="builderUrl" class="field-input flex-1 min-w-[200px] text-sm" readonly><button id="copyBuilderUrl" class="btn-primary text-sm">Copy link</button></div>
+      <div class="mt-4 pt-3 border-t border-twb-sage2">
+        <div class="font-semibold text-twb-green mb-1">If the link doesn't work</div>
+        <p class="mb-2">Copy the questions into an email instead. Your builder or architect replies to you, and you forward their answers to greg@thewellbuild.com. The list is in your confirmation email too.</p>
+        <button id="copyPart2Text" class="btn-secondary text-sm">Copy the questions</button>
+      </div>
+    </div>
+    <div id="doneNext" class="bg-twb-cream rounded-xl p-4 text-sm mb-5">
+      <div class="font-semibold text-twb-green mb-2">What happens next</div>
+      <ol class="list-decimal pl-5 space-y-1 text-twb-text">
+        <li>We open your drawings and confirm we have what we need, or tell you what's missing.</li>
+        <li>Your review starts. If anything in the drawings is unclear, we'll send one short follow-up.</li>
+        <li>Your Spec Book typically arrives 7–10 business days after we have everything.</li>
+      </ol>
+    </div>
+    <button id="doneClose" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<!-- ============ DRAFT PREVIEW OVERLAY (draft mode only) ============ -->
+<div id="previewOverlay" class="overlay no-print hidden">
+  <div class="overlay-card" style="max-width:760px">
+    <div class="text-xs uppercase tracking-widest text-twb-copper font-semibold mb-2">Draft mode</div>
+    <h1 class="text-2xl mb-2">This is what would be sent</h1>
+    <p class="text-sm text-twb-mute mb-4">Submissions are off. Below is what Greg and Rachel would receive by email; each answer also becomes one column in the Sheet.</p>
+    <div id="previewBody"></div>
+    <div class="mt-5 flex gap-3 flex-wrap"><button id="previewClose" class="btn-secondary">Back to the form</button><button id="previewSend" class="btn-primary">Show the thank-you screen</button></div>
+  </div>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="bg-white border-b border-twb-sage2 sticky top-0 z-30 no-print">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-3">
+        <div class="text-xs uppercase tracking-widest text-twb-copper font-semibold whitespace-nowrap">The Well Build</div>
+        <span class="text-twb-sage2">•</span>
+        <h1 class="text-base sm:text-lg serif truncate">Spec Book Intake</h1>
+      </div>
+      <div class="mt-2 flex items-center gap-3">
+        <div class="progress-bar flex-1 max-w-md"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+        <div id="progressLabel" class="text-xs text-twb-mute font-medium tabular-nums">0%</div>
+      </div>
+    </div>
+    <div class="hidden sm:flex items-center gap-2">
+      <span id="saveStatus" class="save-pill"><span>○</span> Not started</span>
+      <button id="saveLinkBtn" class="btn-secondary text-sm">Save &amp; email link</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MAIN LAYOUT ============ -->
+<div class="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+  <aside class="lg:sticky lg:top-[88px] lg:self-start no-print">
+    <button id="sidebarToggle" class="lg:hidden w-full bg-white border border-twb-sage2 rounded-2xl px-4 py-3 text-left flex items-center justify-between" aria-expanded="false">
+      <span class="font-semibold text-twb-green text-sm">Sections</span>
+      <span id="sidebarToggleIcon" class="text-twb-mute text-xs">▼</span>
+    </button>
+    <div id="sidebarPanel" class="hidden lg:block mt-3 lg:mt-0 bg-white border border-twb-sage2 rounded-2xl p-3 lg:max-h-[calc(100vh-110px)] overflow-auto nice-scroll">
+      <nav id="sectionNav" class="space-y-0.5"></nav>
+    </div>
+    <div class="mt-3 sm:hidden">
+      <button id="saveLinkBtnMobile" class="btn-secondary w-full text-sm">Save &amp; email me a link</button>
+    </div>
+  </aside>
+
+  <main class="min-w-0">
+    <div id="sectionRoot"></div>
+    <div class="mt-6 flex flex-wrap items-center gap-3 no-print">
+      <button id="prevBtn" class="btn-secondary">← Previous</button>
+      <div class="flex-1"></div>
+      <button id="nextBtn" class="btn-primary">Next →</button>
+    </div>
+    <div id="submitWrap" class="mt-6 hidden">
+      <div class="bg-twb-cream2 border border-twb-sage2 rounded-2xl p-6">
+        <h2 class="text-2xl mb-2">Ready to send?</h2>
+        <p class="text-twb-text mb-4">
+          Unanswered questions are fine; they become items to confirm in your review. We'll email you a copy of your answers.
+        </p>
+        <button id="submitBtn" class="btn-copper text-base">Send my answers</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- ============ SCHEMA ============ -->
+<script>
+// Spec Book intake, built from plan-review-engine/docs/spec-book-intake.md (Greg's 2026-11-09 draft).
+// Question ids are the keys in plan-review-engine/standard/data/intake.json (marked "(new)" in the doc where not yet there).
+// `num` is the question number in the doc, so answers can be traced back to it.
+// Types: short, paragraph, number, radio, checkboxes, link, subheading, callout.
+// Fields: unsure (string label for the "Not sure" chip, or false), max (checkbox limit),
+//         exclusive (checkbox choices that clear the others), showIf {field, equals|contains|in}, noNote.
+const NS = 'Not sure';
+const ND = 'Not decided';
+
+const FORM_SCHEMA = {
+  title: `The Well Build — Spec Book Intake`,
+  sections: [
+    // ---------------- PART 1: HOMEOWNER ----------------
+    {
+      id: `project`, part: 'You', title: `Your project`,
+      description: `Who you are, where the house is, and where things stand.`,
+      items: [
+        { id:`full_name`, type:`short`, label:`Your name`, required:true, autocomplete:'name', noNote:true, unsure:false },
+        { id:`email_address`, type:`short`, label:`Email`, required:true, inputType:'email', autocomplete:'email', noNote:true, unsure:false,
+          helper:`We'll send a copy of your answers here.` },
+        { id:`phone_number`, type:`short`, label:`Phone`, inputType:'tel', autocomplete:'tel', noNote:true, unsure:false, placeholder:'Optional' },
+        { id:`address`, num:1, type:`short`, label:`Project address`, required:true, unsure:false,
+          helper:`We use it to look up your climate zone, soil, radon and flood conditions.`,
+          placeholder:`Street address, city, state, zip` },
+        { id:`project_type`, num:2, type:`radio`, label:`Project type`, required:true, unsure:false,
+          choices:[`New home`,`Addition`,`Renovation`] },
+        { id:`year_built`, type:`number`, label:`About what year was the existing house built?`, placeholder:'e.g. 1962',
+          showIf:{field:'project_type', in:['Addition','Renovation']}, noNote:true },
+        { id:`existing_house`, type:`checkboxes`, label:`Any history of these in the existing house?`,
+          showIf:{field:'project_type', in:['Addition','Renovation']},
+          choices:[`Roof or window leaks`,`Mold`,`Damp or wet basement`,`None that I know of`], exclusive:[`None that I know of`] },
+        { id:`design_stage`, num:3, type:`radio`, label:`What stage is the project at?`, unsure:false,
+          choices:[`Designing`,`Permit set`,`Bidding`,`Under construction`] },
+        { id:`construction_stage`, type:`radio`, label:`How far along is construction?`,
+          showIf:{field:'design_stage', equals:'Under construction'},
+          choices:[`Foundation`,`Framing`,`Dried in`,`Rough-ins (plumbing, electrical, HVAC)`,`Insulation`,`Drywall`,`Finishes`] },
+        { id:`sq_ft`, num:4, type:`number`, label:`Conditioned square footage`,
+          helper:`Include finished attics and basements. A rough number is fine.`, placeholder:'e.g. 4,200' },
+        { id:`builder_status`, num:5, type:`radio`, label:`Has a builder been selected?`, unsure:false,
+          choices:[`Yes`,`Bidding`,`Not yet`] },
+        { id:`builder_name`, type:`short`, label:`Builder's name or company`, placeholder:'Optional', noNote:true, unsure:false,
+          showIf:{field:'builder_status', equals:'Yes'} },
+        { id:`architect_status`, type:`radio`, label:`Do you have an architect who can still make changes to the drawings?`,
+          helper:`This tells us whether recommendations can go into the drawings or need to go through your builder.`,
+          choices:[`Yes, the architect is still involved`,`No, we're working only with the builder now`,`No architect`] },
+      ]
+    },
+    {
+      id: `drawings`, part: 'You', title: `Your drawings`,
+      description: `We work from the drawings you already have. Floor plans and elevations are enough to start.`,
+      items: [
+        { id:`drawings_method`, type:`radio`, label:`How will you send the drawings?`, required:true, unsure:false, noNote:true,
+          choices:[`Share link (Dropbox, Google Drive, the architect's portal)`,`WeTransfer`,`By email`,`My architect will send them`] },
+        { id:`drawings_link`, type:`link`, label:`Link to the drawings`, unsure:false,
+          showIf:{field:'drawings_method', in:[`Share link (Dropbox, Google Drive, the architect's portal)`,`WeTransfer`]},
+          helper:`Please set the link so anyone with it can view, or share it with greg@thewellbuild.com. WeTransfer links expire after a few days, so send it once you've finished this form.`,
+          placeholder:'https://' },
+        { id:`drawings_email_note`, type:`callout`,
+          showIf:{field:'drawings_method', in:[`By email`,`My architect will send them`]},
+          html:`Send the PDFs to <strong>greg@thewellbuild.com</strong> and <strong>rachel@thewellbuild.com</strong>, with your project address in the subject line. If your architect is sending them, please forward them this note.` },
+        { id:`geotech`, type:`radio`, label:`Has a geotechnical or soils report been done?`,
+          helper:`It covers soil type and the water table, which affect the foundation and waterproofing.`,
+          choices:[`Yes`,`No`] },
+        { id:`geotech_link`, type:`link`, label:`Link to the soils report`, unsure:false, noNote:true, placeholder:'https://',
+          helper:`Or email it to us.`, showIf:{field:'geotech', equals:'Yes'} },
+        { id:`builder_spec`, num:16, type:`link`, label:`Other documents (optional)`, unsure:false,
+          helper:`For example the builder's specification or scope sheet, wall sections, or mechanical plans. A link works best; you can also email them.`,
+          placeholder:'https://' },
+      ]
+    },
+    {
+      id: `household`, part: 'You', title: `Your household`,
+      description: `These answers set the order and emphasis of your review.`,
+      items: [
+        { id:`occupants`, type:`fields`, label:`Who will live in the home?`,
+          fields:[
+            {id:`occupants_adults`, label:`Adults`, type:'number', width:'w-24'},
+            {id:`occupants_children`, label:`Children`, type:'number', width:'w-24'},
+            {id:`occupants_child_ages`, label:`Children's ages`, type:'short', placeholder:'e.g. 2, 7, 11'},
+          ] },
+        { id:`occupants_other`, type:`checkboxes`, label:`Also living in the home`, unsure:false,
+          choices:[`Someone over 65`,`Someone expecting a baby`,`Dogs`,`Cats`,`Other pets`] },
+        { id:`occupancy`, num:9, type:`radio`, label:`Will this be your primary residence?`,
+          choices:[`Primary residence`,`Seasonal or part-time`] },
+        { id:`priorities`, num:6, type:`checkboxes`, max:3, label:`Your top three priorities for the home`,
+          helper:`Pick up to three.`,
+          choices:[`Moisture and mold`,`Indoor air quality`,`Chemicals in materials`,`Water quality`,`EMF mitigation`,`Energy use`,`Durability`] },
+        { id:`low_emf`, type:`radio`, label:`How much should the review focus on low-EMF strategies?`,
+          showIf:{field:'priorities', equals:'EMF mitigation'},
+          choices:[`Low`,`Medium`,`High`] },
+        { id:`health_sensitivity`, num:7, type:`radio`, label:`Does anyone in the household have asthma or allergies?`, unsure:false,
+          choices:[`Yes`,`No`,`Prefer not to say`] },
+        { id:`chemical_sensitivity`, type:`radio`, label:`How sensitive is your household to chemicals and off-gassing?`,
+          choices:[`Not a concern`,`Somewhat sensitive`,`Very sensitive`] },
+        { id:`accepts_foam`, num:8, type:`radio`, label:`Your position on spray foam insulation`,
+          choices:[`No spray foam`,`Minimal, only where it prevents moisture problems`,`No preference`] },
+        { id:`current_home`, num:10, type:`checkboxes`, label:`Problems in your current home`,
+          helper:`Choose any that apply. It helps us connect recommendations to what you've lived with.`,
+          choices:[`Drafts`,`Humidity or condensation`,`Odors`,`Dust`,`Allergy symptoms`,`Uneven temperatures`,`None`], exclusive:[`None`] },
+        { id:`budget_posture`, num:11, type:`radio`, label:`Your approach to the budget for upgrades`,
+          choices:[`Stay close to the builder's standard`,`Invest where it matters most`,`Best available`] },
+      ]
+    },
+    {
+      id: `site`, part: 'You', title: `Climate and water`,
+      description: `We look up the climate from your address. This is about your particular site.`,
+      items: [
+        { id:`microclimate`, type:`checkboxes`, label:`Is there anything about your site a weather report wouldn't show?`,
+          helper:`Pick any that apply.`,
+          choices:[`Wooded or heavily shaded`,`Low spot or valley (fog, cold air, pooling water)`,`Hilltop or exposed to wind`,`Near a lake, river or ocean`,`Wet or slow-draining ground`,`Heavy snow drifts`,`Strong sun or heat on one side`,`Other`] },
+        { id:`microclimate_other`, type:`short`, label:`Tell us more`, unsure:false, noNote:true,
+          showIf:{field:'microclimate', equals:'Other'} },
+        { id:`fuel`, num:12, type:`checkboxes`, label:`Will the house use gas or propane for any of these?`,
+          choices:[`None (all-electric)`,`Range`,`Heating`,`Water heater`,`Fireplace`,`Generator`], exclusive:[`None (all-electric)`] },
+        { id:`water_source`, num:13, type:`radio`, label:`Water source`,
+          choices:[`Municipal`,`Private well`] },
+        { id:`water_test`, type:`link`, label:`Link to a water test, if you have one`, unsure:false, noNote:true,
+          helper:`Optional. You can also email it to us.`, placeholder:'https://',
+          showIf:{field:'water_source', in:['Municipal','Private well']} },
+      ]
+    },
+    {
+      id: `exterior`, part: 'You', title: `Exterior and windows`,
+      description: `If you don't know a brand yet, leave it blank. Your builder or architect may know.`,
+      items: [
+        { id:`cladding`, num:14, type:`checkboxes`, label:`Siding and cladding`,
+          helper:`Many homes use more than one. Check all that apply.`,
+          choices:[`Full brick`,`Thin brick`,`Hard-coat stucco`,`EIFS`,`Natural stone`,`Manufactured stone`,`Fiber cement`,`Wood`,`Vinyl`,`Metal`] },
+        { id:`cladding_brands`, type:`brands`, parentId:`cladding`, label:`Brand or product for each`, noNote:true, unsure:false },
+        { id:`roofing`, num:21, type:`checkboxes`, label:`Roofing`,
+          helper:`Many homes use more than one. Check all that apply.`,
+          choices:[`Asphalt shingle`,`Standing-seam metal`,`Membrane (flat roof)`,`Wood shake`,`Tile`,`Slate`] },
+        { id:`roofing_brands`, type:`brands`, parentId:`roofing`, label:`Brand or product for each`, noNote:true, unsure:false },
+        { id:`windows`, num:22, type:`short`, label:`Window brand`, placeholder:`e.g. Marvin, Andersen, Pella` },
+        { id:`window_frame`, type:`radio`, label:`Window frame material`,
+          choices:[`Wood`,`Clad wood`,`Fiberglass`,`Vinyl`,`Aluminum`,`Steel`] },
+        { id:`window_flange`, type:`radio`, label:`Flanged or flangeless windows?`,
+          helper:`Flanged windows have a nailing fin around the edge. Your builder or window supplier will know.`,
+          choices:[`Flanged`,`Flangeless`] },
+      ]
+    },
+    {
+      id: `goals`, part: 'You', title: `Your goals`,
+      description: ``,
+      items: [
+        { id:`top_concerns`, num:15, type:`paragraph`, unsure:false, noNote:true,
+          label:`Your main concerns about the build, or any decision you're weighing`,
+          helper:`In your own words. This is the most useful answer on the form.` },
+        { id:`part2_mode`, type:`radio`, required:true, unsure:false, noNote:true,
+          label:`The remaining technical questions are best answered by your builder or architect. How would you like to handle them?`,
+          helper:`There are 15 short questions about the foundation, walls, insulation and mechanical systems, and most are a tap. We don't contact your builder or architect directly, so these come through you. Anything left open becomes an item to confirm in your review.`,
+          choices:[`I'll answer them now (with my builder or architect)`,`Send them to my builder or architect`] },
+        { id:`part2_forward_callout`, type:`callout`,
+          showIf:{field:'part2_mode', equals:'Send them to my builder or architect'},
+          html:`After you send this form, you'll get a link to forward to your builder or architect, on screen and in your confirmation email. It opens just their questions, with no login, and their answers come straight to us.` },
+      ]
+    },
+    // ---------------- PART 2: BUILDER OR ARCHITECT ----------------
+    {
+      id: `p2_contact`, part: 'Builder or architect', title: `About you`, builderOnly: true,
+      description: ``,
+      items: [
+        { id:`builder_role`, type:`radio`, label:`You are the project's`, required:true, unsure:false, noNote:true,
+          choices:[`Builder`,`Architect`,`Other`] },
+        { id:`builder_contact_name`, type:`short`, label:`Your name`, required:true, autocomplete:'name', noNote:true, unsure:false },
+        { id:`builder_company`, type:`short`, label:`Company`, autocomplete:'organization', noNote:true, unsure:false },
+        { id:`builder_email`, type:`short`, label:`Email`, inputType:'email', autocomplete:'email', noNote:true, unsure:false,
+          helper:`Optional. We'll send you a copy of your answers.` },
+      ]
+    },
+    {
+      id: `p2_structure`, part: 'Builder or architect', title: `Foundation and structure`,
+      description: `Answered with your builder, or your architect if there's no builder yet. Brief answers are enough. If the builder's specification covers a question, skip it.`,
+      builderDescription: `Brief answers are enough, and "Not decided" is a fine answer. If your specification or scope sheet already covers a question, you can skip it.`,
+      showIfSection:{field:'part2_mode', equals:`I'll answer them now (with my builder or architect)`},
+      items: [
+        { id:`foundation_type`, num:18, type:`checkboxes`, label:`Foundation type`, unsure:ND,
+          choices:[`Basement`,`Vented crawl space`,`Sealed crawl space`,`Slab on grade`] },
+        { id:`below_grade`, type:`checkboxes`, label:`Foundation waterproofing`, unsure:ND,
+          choices:[`Membrane waterproofing`,`Damp-proofing`,`Footing drain`] },
+        { id:`struct_type`, num:19, type:`radio`, label:`Wall framing`, unsure:ND,
+          choices:[`Wood frame`,`Masonry`,`ICF`,`SIPs`], allowOther:true },
+        { id:`sheathing_type`, type:`radio`, label:`Sheathing and weather barrier`, unsure:ND,
+          choices:[`OSB with housewrap`,`Zip System`,`Plywood with membrane`], allowOther:true },
+        { id:`roof_underlayment`, type:`checkboxes`, label:`Roof underlayment`, unsure:ND,
+          choices:[`Synthetic`,`Felt`,`Ice-and-water barrier`] },
+      ]
+    },
+    {
+      id: `p2_insulation`, part: 'Builder or architect', title: `Insulation and attic`,
+      description: ``,
+      showIfSection:{field:'part2_mode', equals:`I'll answer them now (with my builder or architect)`},
+      items: [
+        { id:`insulation_walls`, num:23, type:`checkboxes`, label:`Wall insulation`, unsure:ND,
+          helper:`Between the studs, plus any continuous insulation on the outside.`,
+          choices:[`Batts`,`Blown cellulose or fiberglass`,`Mineral wool`,`Open-cell foam`,`Closed-cell foam`,`Exterior rigid board`] },
+        { id:`insulation_roof`, num:24, type:`checkboxes`, label:`Attic or roof insulation`, unsure:ND,
+          choices:[`Blown cellulose or fiberglass`,`Batts`,`Mineral wool`,`Open-cell foam`,`Closed-cell foam`,`Rigid board above the roof deck`] },
+        { id:`insulation_foundation`, num:25, type:`checkboxes`, label:`Basement, crawl space or slab insulation`, unsure:ND,
+          choices:[`Rigid foam board`,`Closed-cell foam`,`Mineral wool`,`Under-slab rigid board`,`None`], exclusive:[`None`] },
+        { id:`attic_type`, num:26, type:`radio`, label:`Attic type`, unsure:ND,
+          choices:[`Vented`,`Sealed and conditioned`,`Both`] },
+      ]
+    },
+    {
+      id: `p2_mechanical`, part: 'Builder or architect', title: `Mechanical and plumbing`,
+      description: ``,
+      showIfSection:{field:'part2_mode', equals:`I'll answer them now (with my builder or architect)`},
+      items: [
+        { id:`hvac_type`, num:27, type:`checkboxes`, label:`Heating and cooling system`, unsure:ND,
+          choices:[`Heat pump`,`Furnace and AC`,`Mini-splits`,`Radiant`,`Geothermal`] },
+        { id:`manual_j`, type:`radio`, label:`Who is designing it?`, unsure:ND,
+          choices:[`Engineer`,`HVAC contractor`,`Builder`] },
+        { id:`duct_location`, type:`checkboxes`, label:`Where will the ducts and equipment be?`, unsure:ND,
+          choices:[`Conditioned space`,`Attic`,`Crawl space`,`Garage`] },
+        { id:`ventilation`, num:28, type:`checkboxes`, label:`Ventilation and exhaust`, unsure:ND,
+          choices:[`ERV`,`HRV`,`Whole-house dehumidifier`,`Kitchen hood vented outdoors`,`None`], exclusive:[`None`] },
+        { id:`water_heater`, num:29, type:`radio`, label:`Water heater`, unsure:ND,
+          choices:[`Tank`,`Tankless`,`Heat pump`] },
+        { id:`pipe_material`, type:`checkboxes`, label:`Supply piping`, unsure:ND,
+          choices:[`PE-RT`,`PEX-A`,`PEX-B`,`Copper`] },
+      ]
+    },
+  ]
+};
+</script>
+
+<!-- ============ APP ============ -->
+<script>
+// =========================================================
+// CONFIG — leave APPS_SCRIPT_URL blank to keep the form in draft mode (nothing is sent).
+// After Greg approves: deploy apps_script.gs, paste the Web App URL here.
+// =========================================================
+const APPS_SCRIPT_URL = "";
+const DRAFT_MODE = !APPS_SCRIPT_URL;
+// Builder mode: the homeowner forwards ?builder=<token>; it opens only Part 2 for that project.
+const BUILDER_TOKEN = new URLSearchParams(location.search).get('builder');
+const MODE = BUILDER_TOKEN ? 'builder' : 'homeowner';
+let PROJECT = { address:'', client_first_name:'' };
+const STORAGE_KEY = 'twb_specbook_intake_v1' + (BUILDER_TOKEN ? '_b_' + BUILDER_TOKEN : '');
+
+const STATE = { responses:{}, notesOpen:{}, currentSection:0, draftId:null, lastSavedAt:null };
+
+// ---------- helpers (same as the contractor form) ----------
+function el(tag, attrs={}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k,'');
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    if (Array.isArray(c)) c.forEach(x=>e.appendChild(typeof x === 'string' ? document.createTextNode(x) : x));
+    else e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function showToast(msg, ms=2600) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), ms);
+}
+const isAnswerType = it => !['subheading','callout'].includes(it.type);
+function unsureLabel(q) { return q.unsure === false ? null : (q.unsure || NS); }
+
+function matches(cond) {
+  const v = STATE.responses[cond.field];
+  if (cond.equals !== undefined) return Array.isArray(v) ? v.includes(cond.equals) : v === cond.equals;
+  if (cond.in !== undefined) return cond.in.includes(v);
+  return true;
+}
+function isShown(item) {
+  if (item.type === 'brands') return (STATE.responses[item.parentId] || []).some(x => x !== NS && x !== ND);
+  return !item.showIf || matches(item.showIf);
+}
+function sectionShown(s) {
+  if (MODE === 'builder') return s.part !== 'You';
+  if (s.builderOnly) return false;
+  return !s.showIfSection || matches(s.showIfSection);
+}
+function visibleSections() { return FORM_SCHEMA.sections.map((s,i)=>({s,i})).filter(x=>sectionShown(x.s)); }
+
+function questionIsAnswered(q) {
+  if (q.type === 'fields') return q.fields.some(f => String(STATE.responses[f.id] || '').trim() !== '');
+  const v = STATE.responses[q.id];
+  if (v && typeof v === 'object' && !Array.isArray(v)) return Object.values(v).some(x => String(x||'').trim() !== '');
+  if (v == null) return false;
+  if (Array.isArray(v)) return v.length > 0;
+  return String(v).trim() !== '';
+}
+function sectionStatus(sIdx) {
+  const items = FORM_SCHEMA.sections[sIdx].items.filter(it => isAnswerType(it) && isShown(it));
+  const answered = items.filter(questionIsAnswered).length;
+  if (!items.length || answered === 0) return 'empty';
+  return answered === items.length ? 'complete' : 'started';
+}
+function overallProgress() {
+  let total = 0, answered = 0;
+  visibleSections().forEach(({s}) => s.items.filter(it => isAnswerType(it) && isShown(it)).forEach(it => {
+    total++; if (questionIsAnswered(it)) answered++;
+  }));
+  return total ? Math.round(answered/total*100) : 0;
+}
+
+// ---------- persistence ----------
+function saveLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      responses: STATE.responses, notesOpen: STATE.notesOpen, currentSection: STATE.currentSection, draftId: STATE.draftId
+    }));
+    STATE.lastSavedAt = Date.now(); updateSaveStatus();
+  } catch(e) {}
+}
+function loadLocal() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return false; Object.assign(STATE, JSON.parse(raw)); return true; }
+  catch(e) { return false; }
+}
+function updateSaveStatus() {
+  const p = document.getElementById('saveStatus');
+  if (!STATE.lastSavedAt) { p.innerHTML = '<span>○</span> Not started'; return; }
+  const ago = Math.round((Date.now()-STATE.lastSavedAt)/1000);
+  const txt = ago < 5 ? 'Saved just now' : (ago < 60 ? `Saved ${ago}s ago` : `Saved ${Math.round(ago/60)}m ago`);
+  p.innerHTML = '<span style="color:#2B5C3F">●</span> ' + txt;
+}
+setInterval(updateSaveStatus, 15000);
+
+function setValue(qid, val, rerender) {
+  STATE.responses[qid] = val;
+  saveLocal();
+  const s = FORM_SCHEMA.sections[STATE.currentSection];
+  const drivesShowIf = FORM_SCHEMA.sections.some(sec => (sec.showIfSection && sec.showIfSection.field === qid) || sec.items.some(it => it.showIf && it.showIf.field === qid));
+  if (rerender || drivesShowIf) renderSection();
+  updateSidebar(); updateProgress();
+}
+
+// ---------- render a question ----------
+function chip(label, pressed, onclick, extra='') {
+  return el('button', {type:'button', class:'chip '+extra, 'aria-pressed': pressed ? 'true':'false', onclick}, label);
+}
+
+function renderQuestion(q) {
+  if (!isShown(q)) return null;
+  if (q.type === 'subheading') return el('div', {class:'subhead'}, q.label);
+  if (q.type === 'callout') return el('div', {class:'callout', html: q.html});
+
+  const card = el('div', {class:'question-card', 'data-qid': q.id});
+  card.appendChild(el('label', {class:'qlabel', for:'f_'+q.id},
+    el('span', {}, q.label, q.required ? el('span',{class:'req'}, '*') : null)
+  ));
+  if (q.helper) card.appendChild(el('div',{class:'qhelper'}, q.helper));
+
+  const v = STATE.responses[q.id];
+  const UN = unsureLabel(q);
+
+  if (['short','number','link'].includes(q.type)) {
+    const isUn = UN && v === UN;
+    card.appendChild(el('input', {
+      id:'f_'+q.id, class:'field-input'+(q.type==='number'?' md:max-w-xs':''),
+      type: q.type === 'link' ? 'url' : (q.type === 'number' ? 'text' : (q.inputType || 'text')),
+      inputmode: q.type === 'number' ? 'numeric' : false,
+      value: isUn ? '' : (v || ''), placeholder: q.placeholder || 'Type your answer…',
+      autocomplete: q.autocomplete || (q.id === 'address' ? 'street-address' : 'off'),
+      disabled: isUn ? true : false,
+      oninput: e => setValue(q.id, e.target.value)
+    }));
+    if (UN) card.appendChild(el('div',{class:'mt-2'}, chip(UN, isUn, () => setValue(q.id, isUn ? '' : UN, true), 'unsure')));
+  } else if (q.type === 'paragraph') {
+    card.appendChild(el('textarea', {id:'f_'+q.id, class:'field-input', rows:4, placeholder:'Type your answer…',
+      oninput: e => setValue(q.id, e.target.value)}, v || ''));
+  } else if (q.type === 'radio') {
+    const choices = q.choices || [];
+    const isOther = q.allowOther && v && !choices.includes(v) && v !== UN;
+    const otherShown = isOther || (STATE._other && STATE._other[q.id]);
+    const wrap = el('div', {class:'flex gap-2 flex-wrap'});
+    choices.forEach(c => wrap.appendChild(chip(c, v === c, () => { if (STATE._other) delete STATE._other[q.id]; setValue(q.id, v === c ? '' : c, true); })));
+    if (q.allowOther) wrap.appendChild(chip('Other…', otherShown, () => {
+      STATE._other = STATE._other || {};
+      if (otherShown) { delete STATE._other[q.id]; setValue(q.id, '', true); }
+      else { STATE._other[q.id] = true; setValue(q.id, '', true); setTimeout(()=>{ const i = document.querySelector(`[data-qid="${q.id}"] input.field-input`); if (i) i.focus(); },0); }
+    }));
+    if (UN) wrap.appendChild(chip(UN, v === UN, () => { if (STATE._other) delete STATE._other[q.id]; setValue(q.id, v === UN ? '' : UN, true); }, 'unsure'));
+    card.appendChild(wrap);
+    if (otherShown) card.appendChild(el('div',{class:'mt-2'}, el('input', {class:'field-input', placeholder:'Specify other…',
+      value: isOther ? v : '', oninput: e => setValue(q.id, e.target.value)})));
+  } else if (q.type === 'fields') {
+    const wrap = el('div', {class:'flex gap-3 flex-wrap items-end'});
+    q.fields.forEach(f => wrap.appendChild(el('div', {class: f.width ? '' : 'flex-1 min-w-[180px]'},
+      el('div', {class:'glabel', style:'margin-top:0'}, f.label),
+      el('input', {class:'field-input ' + (f.width || ''), type:'text', inputmode: f.type === 'number' ? 'numeric' : false,
+        value: STATE.responses[f.id] || '', placeholder: f.placeholder || '',
+        oninput: e => setValue(f.id, e.target.value)}))));
+    card.appendChild(wrap);
+  } else if (q.type === 'brands') {
+    // One brand field per type checked in the parent question (same idea as the contractor form's cladding_repeater)
+    const picked = (STATE.responses[q.parentId] || []).filter(x => x !== NS && x !== ND);
+    if (!picked.length) return null;
+    const data = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+    picked.forEach(t => card.appendChild(el('div', {class:'flex gap-3 items-center mb-2 flex-wrap'},
+      el('div', {class:'text-sm font-semibold text-twb-green w-40 flex-shrink-0'}, t),
+      el('input', {class:'field-input flex-1 min-w-[180px]', type:'text', value: data[t] || '', placeholder:'Brand or product, if known',
+        oninput: e => { const cur = {...(STATE.responses[q.id] || {})}; cur[t] = e.target.value; STATE.responses[q.id] = cur; saveLocal(); }}))));
+  } else if (q.type === 'checkboxes') {
+    const cur = Array.isArray(v) ? v : [];
+    const atMax = q.max && cur.filter(x => x !== UN).length >= q.max;
+    const wrap = el('div', {class:'flex gap-2 flex-wrap'});
+    const exclusive = (q.exclusive || []).concat(UN ? [UN] : []);
+    const toggle = c => {
+      let arr = Array.isArray(STATE.responses[q.id]) ? [...STATE.responses[q.id]] : [];
+      if (arr.includes(c)) arr = arr.filter(x => x !== c);
+      else if (exclusive.includes(c)) arr = [c];
+      else arr = arr.filter(x => !exclusive.includes(x)).concat([c]);
+      setValue(q.id, arr, true);
+    };
+    (q.choices || []).forEach(c => {
+      const on = cur.includes(c);
+      const b = chip(c, on, () => toggle(c));
+      if (atMax && !on && !exclusive.includes(c)) b.disabled = true;
+      wrap.appendChild(b);
+    });
+    if (UN) wrap.appendChild(chip(UN, cur.includes(UN), () => toggle(UN), 'unsure'));
+    card.appendChild(wrap);
+  }
+
+  // Notes field: every question has one (spec-book-intake.md), for answers that differ by location
+  if (!q.noNote) {
+    const nid = q.id + '__note';
+    const nv = STATE.responses[nid] || '';
+    const open = nv || STATE.notesOpen[q.id];
+    if (open) {
+      card.appendChild(el('textarea', {class:'field-input mt-3 text-sm', rows:2,
+        placeholder:'Add a note, for example if the answer differs in parts of the house',
+        oninput: e => { STATE.responses[nid] = e.target.value; saveLocal(); }}, nv));
+    } else {
+      card.appendChild(el('button', {type:'button', class:'note-toggle', onclick: () => { STATE.notesOpen[q.id] = true; saveLocal(); renderSection();
+        setTimeout(()=>{ const t = document.querySelector(`[data-qid="${q.id}"] textarea`); if (t) t.focus(); }, 0); }}, '+ Add a note'));
+    }
+  }
+  return card;
+}
+
+// ---------- render a section ----------
+function renderSection() {
+  const root = document.getElementById('sectionRoot');
+  const scrollY = window.scrollY;
+  root.innerHTML = '';
+  const vis = visibleSections();
+  if (!sectionShown(FORM_SCHEMA.sections[STATE.currentSection])) STATE.currentSection = vis[vis.length-1].i;
+  const s = FORM_SCHEMA.sections[STATE.currentSection];
+  const pos = vis.findIndex(x => x.i === STATE.currentSection);
+
+  root.appendChild(el('div', {class:'mb-5'},
+    el('div', {class:'text-xs uppercase tracking-widest text-twb-copper font-semibold mb-1'},
+      MODE === 'builder' ? `${PROJECT.address || 'Your project'} · Page ${pos+1} of ${vis.length}`
+        : `${s.part === 'You' ? 'Part 1 · You' : 'Part 2 · Your builder or architect'} · Page ${pos+1} of ${vis.length}`),
+    el('h2', {class:'text-3xl mb-1'}, s.title),
+    (MODE === 'builder' ? s.builderDescription : s.description) ? el('p',{class:'text-twb-mute max-w-2xl'}, MODE === 'builder' ? s.builderDescription : s.description) : null
+  ));
+  s.items.forEach(q => { const n = renderQuestion(q); if (n) root.appendChild(n); });
+
+  const last = pos === vis.length - 1;
+  document.getElementById('submitWrap').classList.toggle('hidden', !last);
+  document.getElementById('nextBtn').classList.toggle('hidden', last);
+  document.getElementById('prevBtn').disabled = pos === 0;
+  document.getElementById('prevBtn').classList.toggle('opacity-50', pos === 0);
+
+  if (document.getElementById('f_address')) attachPhotonAutocomplete();
+
+  if (STATE._lastRendered !== STATE.currentSection) { window.scrollTo({top:0, behavior:'smooth'}); STATE._lastRendered = STATE.currentSection; }
+  else window.scrollTo(0, scrollY);
+}
+
+function updateSidebar() {
+  const nav = document.getElementById('sectionNav');
+  nav.innerHTML = '';
+  let lastPart = null, n = 0;
+  visibleSections().forEach(({s, i}) => {
+    n++;
+    if (s.part !== lastPart && MODE !== 'builder') { nav.appendChild(el('div',{class:'nav-part'}, s.part === 'You' ? 'Part 1 · You' : 'Part 2 · Builder or architect')); lastPart = s.part; }
+    nav.appendChild(el('div', {
+      class:'sec-link' + (i === STATE.currentSection ? ' active' : ''), 'data-status': sectionStatus(i),
+      onclick: () => { STATE.currentSection = i; saveLocal(); renderSection(); updateSidebar(); }
+    }, el('span',{class:'sec-num'}, String(n)), el('span',{class:'sec-dot'}), el('span',{class:'flex-1 truncate'}, s.title)));
+  });
+}
+function updateProgress() {
+  const pct = overallProgress();
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '%';
+}
+(function wireSidebarToggle() {
+  const btn = document.getElementById('sidebarToggle'), panel = document.getElementById('sidebarPanel'), icon = document.getElementById('sidebarToggleIcon');
+  btn.addEventListener('click', () => { const h = panel.classList.toggle('hidden'); btn.setAttribute('aria-expanded', String(!h)); icon.textContent = h ? '▼' : '▲'; });
+  document.addEventListener('click', e => { if (window.innerWidth >= 1024) return; if (e.target.closest('.sec-link')) { panel.classList.add('hidden'); icon.textContent = '▼'; } });
+})();
+
+// ---------- navigation ----------
+function step(dir) {
+  const vis = visibleSections(); const pos = vis.findIndex(x => x.i === STATE.currentSection);
+  const next = vis[pos + dir]; if (!next) return;
+  STATE.currentSection = next.i; saveLocal(); renderSection(); updateSidebar(); updateProgress();
+}
+document.getElementById('nextBtn').addEventListener('click', () => step(+1));
+document.getElementById('prevBtn').addEventListener('click', () => step(-1));
+
+// ---------- address autocomplete (Photon / OpenStreetMap, same as the contractor form) ----------
+let _photonTimer = null, _photonActive = -1;
+function attachPhotonAutocomplete() {
+  const input = document.getElementById('f_address');
+  if (!input || input.dataset.photon === '1') return;
+  input.dataset.photon = '1'; input.setAttribute('autocomplete','off');
+  const dd = document.createElement('div');
+  dd.className = 'hidden';
+  dd.style.cssText = 'position:absolute;background:#FEFDFB;border:1px solid #C5D8CC;border-radius:10px;box-shadow:0 10px 30px rgba(30,68,48,.12);z-index:40;margin-top:4px;max-height:280px;overflow-y:auto;font-size:14px';
+  input.parentElement.style.position = 'relative'; input.parentElement.appendChild(dd);
+  const close = () => { dd.classList.add('hidden'); dd.innerHTML = ''; _photonActive = -1; };
+  const hl = () => Array.from(dd.children).forEach((c,i) => c.style.background = i === _photonActive ? '#F1F6F2' : 'transparent');
+  async function fetchS(q) {
+    if (!q || q.length < 3) return close();
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en`);
+      const j = await res.json();
+      const items = (j.features||[]).map(f => { const p = f.properties||{};
+        const line1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || '';
+        const loc = [p.city, p.state, p.postcode].filter(Boolean).join(', ');
+        return {primary: line1, secondary: loc, full: [line1, loc].filter(Boolean).join(', ')}; }).filter(x => x.primary);
+      dd.innerHTML = ''; _photonActive = -1;
+      if (!items.length) return close();
+      const r = input.getBoundingClientRect(), pr = input.parentElement.getBoundingClientRect();
+      dd.style.left = (r.left-pr.left)+'px'; dd.style.top = (r.bottom-pr.top)+'px'; dd.style.width = r.width+'px';
+      items.forEach((it, idx) => {
+        const row = el('div', {style:'padding:10px 14px;cursor:pointer;border-bottom:1px solid #F1F0EB;line-height:1.35'},
+          el('div',{style:'color:#2A2A2A;font-weight:500'}, it.primary), el('div',{style:'color:#6B6B6B;font-size:12px;margin-top:2px'}, it.secondary));
+        row.onmouseenter = () => { _photonActive = idx; hl(); };
+        row.onmousedown = e => { e.preventDefault(); input.value = it.full; setValue('address', it.full); close(); };
+        dd.appendChild(row);
+      });
+      dd.classList.remove('hidden');
+    } catch(e) { close(); }
+  }
+  input.addEventListener('input', e => { clearTimeout(_photonTimer); _photonTimer = setTimeout(() => fetchS(e.target.value), 220); });
+  input.addEventListener('keydown', e => {
+    const n = dd.children.length; if (dd.classList.contains('hidden') || !n) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); _photonActive = (_photonActive+1)%n; hl(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); _photonActive = (_photonActive-1+n)%n; hl(); }
+    else if (e.key === 'Enter' && _photonActive >= 0) { e.preventDefault(); dd.children[_photonActive].dispatchEvent(new MouseEvent('mousedown')); }
+    else if (e.key === 'Escape') close();
+  });
+  input.addEventListener('blur', () => setTimeout(close, 150));
+}
+
+// ---------- Part 2 as plain text: backup if the builder link doesn't work ----------
+function part2Text() {
+  const lines = [
+    'Questions from The Well Build for the builder or architect',
+    `Project: ${STATE.responses.address || ''}`,
+    'Brief answers are fine, and "Not decided" is fine for anything still open. Please reply to the homeowner, who will forward your answers to The Well Build.',
+    ''
+  ];
+  FORM_SCHEMA.sections.filter(s => s.part !== 'You' && !s.builderOnly).forEach(s => {
+    lines.push(s.title.toUpperCase());
+    s.items.filter(isAnswerType).forEach(q => lines.push(`- ${q.label}${q.choices ? ': ' + q.choices.join(' / ') : ''}`));
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+// ---------- payload (same shape as the contractor form, so the backend needs no schema) ----------
+function displayOf(v, q) {
+  const r = STATE.responses;
+  if (q && q.type === 'fields') return q.fields.filter(f => r[f.id]).map(f => `${f.label}: ${r[f.id]}`).join(' · ');
+  if (v == null || v === '') return '';
+  if (Array.isArray(v)) return v.join(', ');
+  if (typeof v === 'object') return Object.entries(v).filter(([k,x]) => x && (r[q.parentId] || []).includes(k)).map(([k,x]) => `${k}: ${x}`).join(' · ');
+  return String(v);
+}
+function buildSubmissionPayload() {
+  const r = STATE.responses;
+  const sections = FORM_SCHEMA.sections.map(s => {
+    const shown = sectionShown(s);
+    return {
+      id: s.id, title: s.title, part: s.part, skipped: !shown,
+      items: !shown ? [] : s.items.filter(isAnswerType).filter(isShown).map(it => ({
+        id: it.id, num: it.num || '', label: it.label, value: r[it.id] ?? '', display: displayOf(r[it.id], it), note: r[it.id + '__note'] || ''
+      }))
+    };
+  });
+  const cover = {
+    full_name: r.full_name || '', email_address: r.email_address || '', phone_number: r.phone_number || '',
+    address: r.address || '', project_type: r.project_type || '', drawings_method: r.drawings_method || '',
+    drawings_link: r.drawings_link || '', part2_mode: r.part2_mode || '',
+    order: new URLSearchParams(location.search).get('order') || '',
+    builder_role: r.builder_role || '', builder_contact_name: r.builder_contact_name || '', builder_company: r.builder_company || '', builder_email: r.builder_email || ''
+  };
+  return { mode: MODE, sections, cover, responses: r, part2_text: MODE === 'homeowner' ? part2Text() : '' };
+}
+
+// ---------- submit ----------
+function missingRequired() {
+  const out = [];
+  visibleSections().forEach(({s, i}) => s.items.forEach(q => {
+    if (q.required && isShown(q) && !questionIsAnswered(q)) out.push({q, i});
+  }));
+  return out;
+}
+async function submitForm() {
+  const missing = missingRequired();
+  if (missing.length) {
+    const {q, i} = missing[0];
+    STATE.currentSection = i; renderSection(); updateSidebar();
+    showToast(`Please answer "${q.label}"` + (missing.length > 1 ? ` and ${missing.length-1} more` : ''), 4500);
+    setTimeout(() => { const n = document.querySelector(`[data-qid="${q.id}"]`); if (n) { n.scrollIntoView({behavior:'smooth', block:'center'}); n.style.borderColor = '#A8593E'; } }, 300);
+    return;
+  }
+  const payload = buildSubmissionPayload();
+  if (DRAFT_MODE) return showPreview(payload);
+  showToast('Sending…');
+  try {
+    const res = MODE === 'builder'
+      ? await postJson({action:'builder_submit', token: BUILDER_TOKEN, payload})
+      : await postJson({action:'submit', draftId: STATE.draftId, payload});
+    if (res && res.ok) {
+      localStorage.removeItem(STORAGE_KEY);
+      if (location.search.includes('draft=')) history.replaceState({}, '', location.pathname);
+      showDone(res.builderUrl);
+    } else showToast((res && res.error === 'already_submitted') ? 'These answers were already sent. Thank you.' : 'That didn\'t go through. Please try again.', 4000);
+  } catch(e) { showToast('Network error. Your answers are still saved on this device.', 4000); }
+}
+function showDone(builderUrl) {
+  const o = document.getElementById('doneOverlay');
+  if (MODE === 'builder') {
+    document.getElementById('doneTitle').textContent = 'Thank you';
+    document.getElementById('doneLede').textContent = 'Your answers are in. They go into the homeowner\'s Spec Book review, and anything marked Not decided becomes an item to confirm.';
+    document.getElementById('doneNext').classList.add('hidden');
+  }
+  const box = document.getElementById('doneBuilder');
+  if (MODE === 'homeowner' && STATE.responses.part2_mode === 'Send them to my builder or architect' && builderUrl) {
+    document.getElementById('builderUrl').value = builderUrl;
+    box.classList.remove('hidden');
+  } else box.classList.add('hidden');
+  o.classList.remove('hidden');
+}
+document.getElementById('copyPart2Text').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(part2Text()); showToast('Questions copied. Paste them into an email to your builder or architect.', 4000); }
+  catch(e) { showToast('Could not copy. The questions are in your confirmation email.', 4000); }
+});
+document.getElementById('copyBuilderUrl').addEventListener('click', async () => {
+  const v = document.getElementById('builderUrl').value;
+  try { await navigator.clipboard.writeText(v); showToast('Link copied. Paste it into an email or text to your builder or architect.', 4000); }
+  catch(e) { document.getElementById('builderUrl').select(); showToast('Select the link and copy it.', 3000); }
+});
+
+function showPreview(payload) {
+  const body = document.getElementById('previewBody'); body.innerHTML = '';
+  payload.sections.forEach(s => {
+    if (s.skipped && (MODE === 'builder' || s.id === 'p2_contact')) return;
+    body.appendChild(el('div', {class:'serif text-lg mt-4 mb-1'}, s.title));
+    if (s.skipped) { body.appendChild(el('div',{class:'text-sm text-twb-mute italic'}, 'Not answered on the form (' + (payload.cover.part2_mode || 'no choice') + ')')); return; }
+    const t = el('table', {class:'preview-table w-full bg-white border border-twb-sage2 rounded-lg'});
+    s.items.forEach(it => t.appendChild(el('tr', {},
+      el('td', {}, (it.num ? it.num + '. ' : '') + it.label),
+      el('td', {}, it.display || '—', it.note ? el('div',{class:'text-twb-mute mt-1'}, 'Note: ' + it.note) : null))));
+    body.appendChild(t);
+  });
+  const ps = document.getElementById('previewSend');
+  ps.onclick = () => { document.getElementById('previewOverlay').classList.add('hidden');
+    showDone(location.origin + location.pathname + '?builder=DRAFT-EXAMPLE'); };
+  document.getElementById('previewOverlay').classList.remove('hidden');
+}
+document.getElementById('submitBtn').addEventListener('click', submitForm);
+document.getElementById('doneClose').addEventListener('click', () => document.getElementById('doneOverlay').classList.add('hidden'));
+document.getElementById('previewClose').addEventListener('click', () => document.getElementById('previewOverlay').classList.add('hidden'));
+
+async function postJson(body) {
+  // Apps Script Web Apps don't support CORS preflight, so send as text/plain
+  const res = await fetch(APPS_SCRIPT_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body), redirect:'follow'});
+  return res.json();
+}
+
+// ---------- save & email link ----------
+async function saveAndEmailLink() {
+  if (DRAFT_MODE) return showToast('Draft mode: email links are off. Your progress is saved on this device.', 4000);
+  let email = STATE.responses.email_address || '';
+  if (!email) { email = prompt('Enter your email so we can send you a link to finish later:') || ''; if (!email) return; setValue('email_address', email); }
+  showToast('Saving…');
+  try {
+    const res = await postJson({action:'save_draft', draftId: STATE.draftId, email, payload:{responses: STATE.responses, currentSection: STATE.currentSection}});
+    if (res && res.ok) { STATE.draftId = res.draftId; saveLocal(); showToast('Saved. We emailed a link to ' + email, 4500); }
+    else showToast('Could not save. Your progress is still saved on this device.', 4000);
+  } catch(e) { showToast('Network error. Your progress is still saved on this device.', 4000); }
+}
+document.getElementById('saveLinkBtn').addEventListener('click', saveAndEmailLink);
+document.getElementById('saveLinkBtnMobile').addEventListener('click', saveAndEmailLink);
+
+async function maybeResumeFromUrl() {
+  const draftId = new URLSearchParams(location.search).get('draft');
+  if (!draftId || DRAFT_MODE) return false;
+  try {
+    const res = await postJson({action:'resume_draft', draftId});
+    if (res && res.ok && res.payload) {
+      STATE.responses = res.payload.responses || {}; STATE.currentSection = res.payload.currentSection || 0; STATE.draftId = draftId;
+      saveLocal(); showToast('Welcome back. Your answers were restored.', 3500); return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ---------- boot ----------
+async function boot() {
+  if (DRAFT_MODE) document.getElementById('draftBand').classList.remove('hidden');
+  if (MODE === 'builder') { await bootBuilder(); return; }
+  // The Shopify order email links here with ?order=<order number> only (no name or email in the URL).
+  const resumed = await maybeResumeFromUrl();
+  const intro = document.getElementById('introOverlay');
+  const start = () => { intro.classList.add('hidden'); renderSection(); updateSidebar(); updateProgress(); };
+  if (!resumed) {
+    const hasLocal = loadLocal() && Object.keys(STATE.responses).length > 0;
+    if (hasLocal) {
+      document.getElementById('introResume').classList.remove('hidden');
+      document.getElementById('introResume').onclick = start;
+      document.getElementById('introStart').textContent = 'Start over';
+      document.getElementById('introStart').onclick = () => {
+        if (!confirm('Clear your answers and start over?')) return;
+        STATE.responses = {}; STATE.notesOpen = {}; STATE.currentSection = 0; STATE.draftId = null; saveLocal(); start();
+      };
+    } else document.getElementById('introStart').onclick = start;
+    intro.classList.remove('hidden');
+  } else start();
+  updateSidebar(); updateProgress();
+}
+async function bootBuilder() {
+  document.title = 'The Well Build — Builder Questions';
+  document.querySelector('header h1').textContent = 'Builder & Architect Questions';
+  ['saveLinkBtn','saveLinkBtnMobile'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  if (DRAFT_MODE) PROJECT = { address:'123 Example Road, Nashville, TN', client_first_name:'Jane' };
+  else {
+    try {
+      const res = await postJson({action:'builder_lookup', token: BUILDER_TOKEN});
+      if (!res || !res.ok) {
+        document.getElementById('sectionRoot').innerHTML = '<div class="question-card"><h2 class="text-2xl mb-2">This link isn\'t working</h2><p>Please ask the homeowner to forward the link from their confirmation email again, or contact greg@thewellbuild.com.</p></div>';
+        document.querySelector('main .mt-6').classList.add('hidden'); return;
+      }
+      if (res.alreadySubmitted) showToast('Answers for this project were already sent. Sending again will replace them.', 5000);
+      PROJECT = res.project;
+    } catch(e) {}
+  }
+  loadLocal();
+  const intro = document.getElementById('introOverlay');
+  intro.querySelector('h1').textContent = 'A few questions about ' + (PROJECT.address || 'this project');
+  intro.querySelector('p').textContent = (PROJECT.client_first_name ? PROJECT.client_first_name + ' has' : 'The homeowner has') +
+    ' hired The Well Build to review the drawings and write material specifications for this house. These questions cover what the drawings usually don\'t show.';
+  intro.querySelector('ul').innerHTML = [
+    'About <strong>10 minutes</strong>, and most answers are a tap.',
+    '<strong>Not decided</strong> is a fine answer. Open items go into the review as things to confirm.',
+    'If your specification or scope sheet covers a question, you can skip it.',
+    'Your progress is saved on this device until you send it.'
+  ].map(t => `<li class="flex gap-2"><span class="text-twb-green flex-shrink-0">●</span><span>${t}</span></li>`).join('');
+  const startBtn = document.getElementById('introStart');
+  startBtn.onclick = () => { intro.classList.add('hidden'); renderSection(); updateSidebar(); updateProgress(); };
+  if (!sectionShown(FORM_SCHEMA.sections[STATE.currentSection])) STATE.currentSection = visibleSections()[0].i;
+  intro.classList.remove('hidden');
+  updateSidebar(); updateProgress();
+}
+
+boot();
+</script>
+</body>
+</html>
