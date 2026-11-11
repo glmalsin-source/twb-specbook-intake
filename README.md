@@ -23,7 +23,7 @@ Same look and engine as the contractor form (`twb-builder-form`), about 10 minut
 
 ## Draft mode
 
-While `APPS_SCRIPT_URL` in `index.html` is blank, nothing is sent: a band at the top says so, and
+Draft mode: if `APPS_SCRIPT_URL` in `index.html` is blank, nothing is sent: a band at the top says so, and
 "Send my answers" shows a preview instead. Add `?builder=test` to the URL to see the builder view.
 
 ## Going live (checklist)
