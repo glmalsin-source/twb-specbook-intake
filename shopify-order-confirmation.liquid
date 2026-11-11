@@ -1,6 +1,6 @@
         {% comment %} TWB — Spec Book: intake questionnaire link. Shows only when the order includes the Spec Book.
-          Placement: in Settings → Notifications → Order confirmation, directly after the "Single Session Strategy Call"
-          block's closing {% endfor %} and before {% assign transaction_count = transactions | size %}.
+          Placement: in Settings → Notifications → Order confirmation, directly after the end of the
+          "Single Session Strategy Call" block and before the line that assigns transaction_count.
           The link carries only the order number (no name or email in the URL). {% endcomment %}
         {% for line in line_items %}
           {% if line.product.handle == 'healthy-home-spec-book' %}
